@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - Course Meeting: Tue/Thu, 9:00-10:15am, Location TBD
 - Office hours: Monday 1:30-2:30 on [Zoom](https://yale.zoom.us/j/91504731543?pwd=Q2oycVk4NG1NbHgyMExvNkUzWUFaUT09) and Thu 10:30-11:30, in my office.
 - Teaching Fellows, ULAs, and course manager, and office hours: see Canvas
-- Midterms: TBD
+- Midterms: Tue Feb 20, 9am-10:15am, and Tue Apr 2, 9am-10:15am, both in our classroom
 - Final exam: Wed May 8, 9am-12pm, Room TBD
 - Schedule: See shared spreadsheet
 
