@@ -126,7 +126,7 @@ Class time will be a mix of live-coding in R, in-class small group activities, i
 
 **Ed Discussion and GitHub Issues.** You will be able to ask questions on Ed Discussion and GitHub issues.  The same guidelines as office hours apply here: You are expected to attempt problems before seeking help, and when you ask for help, clearly state what you have attempted, where you got stuck, and what specific question you have. Use minimal reproducible examples when possible. 
 
-**Announcements.** I will make announcements on Canvas throughout the semester. You are expected to read these announcements, so I suggest that you make sure that Canvas notifications are turned on for announcements in this course. If you receive Canvas announcements in email, formatting may be bad. If so, click the link to view announcements in the web browser. 
+**Announcements.** I will make announcements on Canvas throughout the semester. You are expected to read these announcements, so I suggest that you make sure that Canvas notifications are turned on for announcements in this course. If you receive Canvas announcements in email, the formatting may be bad. If so, click the link to view announcements in the web browser. 
 
 
 ## Academic Integrity
