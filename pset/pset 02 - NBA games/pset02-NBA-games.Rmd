@@ -18,7 +18,7 @@ First, if you created a branch on the `bmacGTPM/361-Spring-2024` repo,
 - Make a backup copy of any work you've done on that branch. 
 - Then delete your branch on the `bmacGTPM/361-Spring-2024` repo.
 
-If you have a pull request, please cancel/delete it. This might automatically be deleted if you delete your branch. 
+If you have a pull request, please close it. This might automatically be deleted if you delete your branch. 
 
 Second, if you created a fork previously, please make sure it is private (Settings, "Change repository visibility" all the way at the bottom). If not, you may have to backup your work, delete the repo and create another fork, especially if your repo doesn't say "forked from `bmacGTPM/361-Spring-2024`" anymore.  
 
