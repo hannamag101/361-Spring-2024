@@ -3,8 +3,8 @@ title: "Pset 1 - Water usage"
 author: "425/625"
 date: "Spring 2024"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -127,7 +127,7 @@ dd2
 
 Create a visual representation of the information in Table 2. Create a visualization (or visualizations) that contains mean, change, and percent change in water usage from each crop and source. 
 
-```{r}
+```{r, width= 10, height = 14}
 # Function to create a plot with an enhanced appearance
 create_plot <- function(data, y_value, y_label, title) {
   data %>%
@@ -140,7 +140,7 @@ create_plot <- function(data, y_value, y_label, title) {
           legend.position = "top", # Move legend to the bottom
           legend.title = element_blank(), # Remove the legend title
           plot.title = element_text(face = "bold", size = 18), # Bold and larger plot title
-          axis.title = element_text(size = 14)) # Larger axis titles 
+          axis.title = element_text(size = 12)) # Larger axis titles 
 }
 
 dd2 <- dd2 %>%
@@ -189,6 +189,7 @@ grid_plot = ggplot(dd2,
   geom_tile(linewidth   = 0.4, 
             show.legend = T, 
             color       = pubdarkgray) +
+  coord_fixed() +
   scale_fill_gradient(low      = pubgradgray,
                       high     = pubblue, 
                       na.value = pubmediumgray, ## same color as below
