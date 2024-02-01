@@ -166,10 +166,6 @@ More examples and options can be found here https://rstudio.github.io/DT or here
 >
 > ```options(DT.options = list(pageLength = 5, language = list(search = 'Filter:')))```
 
-## Previous season scoring averages
-
-
-
 ## Home advantage
 
 Let's see if we can detect any sort of home advantage. It will be more appropriate to do this in the context of regression later but for now the easiest way to do this is to find the average margin of victory by the home team. 
@@ -273,7 +269,7 @@ cor(ds$s2021,
 
 
 ## Formatting with `pubtheme`
-The previous plot was functional and told us what we wanted to know. But let's start using `pubtheme`.  We'll copy and paste the scatter plot code from here and edit it for our data. 
+The previous plot was functional and told us what we wanted to know. But let's start using `pubtheme`.  We'll copy and paste the scatter plot code from https://github.com/bmacGTPM/pubtheme and edit it for our data. 
 
 ```{r fig.height=6, fig.width=6}
 title = 'Average Points in 2021-22 vs 2020-21'
@@ -329,7 +325,14 @@ g %>%
 Find opponents points. 
 
 ```{r}
+opp.pts = dd %>%
+  group_by(team) %>%
+  summarise(avg.pts.allowed = mean(opp.score))
 
+dd = dd %>% 
+  left_join(opp.pts, 
+            by = c('opp' = 'team'))
+head(dd)
 ```
 
 Add columns with conference and division to the data. 
@@ -361,6 +364,34 @@ Now we can make a scatter plot of points scored vs average points allowed by opp
 
 ```{r fig.width=6, fig.height=5}
 
+title = "Points Scored vs Average Opp Points Allowed" 
+
+g = ggplot(dg, aes(x     = avg.pts.allowed, 
+                   y     = score, 
+                   group = group, 
+                   color = group))+
+  geom_jitter(width  = 0.1, 
+              height = 0.1, 
+              alpha  = 0.1, 
+              size   = .75, 
+              show.legend = F) +
+  geom_smooth(method = 'lm', 
+              alpha  = 0.1, 
+              se     = F, 
+              size   = 1,
+              show.legend = F) +
+  geom_abline(slope = 1, 
+              intercept = 0) + 
+  facet_wrap(~div, 
+             nrow = 2) +
+  labs(title = title,
+       x     = 'Avg Points Allowed by Opponent',
+       y     = 'Points Scored in the Game')
+
+g %>% 
+  pub(xlim  = c(105, 119), 
+      ylim  = c(80 , 150), 
+      facet = T)
 
 ```
 
@@ -457,11 +488,11 @@ title = "Number of Games With Each Number of Days Rest"
 g = ggplot(dg, 
            aes(x = games, 
                y = team))+
-  geom_bar(stat  = 'identity', 
+  geom_bar(stat  = 'identity', ## optional lightgray background bars 
            aes(x = max+10), 
            color = NA, 
            fill  = publightgray, 
-           width = 0.8) + ## optional background bars. 
+           width = 0.8) + 
   geom_bar(stat = 'identity', 
            fill = pubred, 
            color = NA, 
