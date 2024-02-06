@@ -3,8 +3,8 @@ title: "Pset 1 - Water usage"
 author: "425/625"
 date: "Spring 2024"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
