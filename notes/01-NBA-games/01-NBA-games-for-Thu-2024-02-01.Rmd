@@ -166,6 +166,10 @@ More examples and options can be found here https://rstudio.github.io/DT or here
 >
 > ```options(DT.options = list(pageLength = 5, language = list(search = 'Filter:')))```
 
+## Previous season scoring averages
+
+
+
 ## Home advantage
 
 Let's see if we can detect any sort of home advantage. It will be more appropriate to do this in the context of regression later but for now the easiest way to do this is to find the average margin of victory by the home team. 
@@ -209,15 +213,6 @@ There is some evidences of variation in home advantage among teams. We'll do mor
 Let's see if a team's average points scored from the previous season is related to their points scored in the current season.  First, we'll have to rearrange the data a little since teams can appear in both the home and away column. Ideally, we would have one column with the team name, and one column with the score. Each game would then have two rows, one for the away team and one for the home team. Here is one way to do that:
 
 ```{r}
-da = d %>% select(date, away, ascore, home, hscore, season, gid) 
-dh = d %>% select(date, home, hscore, away, ascore, season, gid)
-
-colnames(da) = c('date', 'team', 'score', 'opp', 'opp.score', 'season', 'gid')
-colnames(dh) = c('date', 'team', 'score', 'opp', 'opp.score', 'season', 'gid')
-
-dd = bind_rows(da, dh) %>%
-  arrange(date, gid)
-head(dd)
 
 ```
 
@@ -226,38 +221,17 @@ Note that, for example, the first two rows correspond to the first game, and con
 Now we can compute average points scored by team for each season. 
 
 ```{r}
-ds = dd %>%
-  group_by(team, season) %>%
-  summarise(score = mean(score))
 
-head(ds)
-  
 ```
 We now have two rows per team, one for each season. If we want a scatter plot, we'll `pivot_wider` to have a column for each season. We don't want column names that start with a number (we would have to use the tick marks ``` `2022` ``` all the time), so we'll rename those too.
 
 ```{r}
-ds = ds %>%
-  pivot_wider(id_cols = team, 
-              names_from = season, 
-              values_from = score) %>%
-  rename(s2021 = `2021`, 
-         s2022 = `2022`)
-
-head(ds)
 
 ```
 Now we can make a scatter plot. 
 
 ```{r}
-g = ggplot(ds, 
-       aes(x = s2021, 
-           y = s2022, 
-           label = team)) + 
-  geom_point() + 
-  geom_text(hjust = -.1) + 
-  geom_smooth(method = 'lm')
 
-g
 ```
 
 Current and previous season performances are related, despite the fact that some players, coaches, and front office personnel change teams in the offseason. Also, note the correlation is about `r round(cor(ds$s2021, ds$s2022),2)`:
@@ -269,7 +243,7 @@ cor(ds$s2021,
 
 
 ## Formatting with `pubtheme`
-The previous plot was functional and told us what we wanted to know. But let's start using `pubtheme`.  We'll copy and paste the scatter plot code from https://github.com/bmacGTPM/pubtheme and edit it for our data. 
+The previous plot was functional and told us what we wanted to know. But let's start using `pubtheme`.  We'll copy and paste the scatter plot code from here and edit it for our data. 
 
 ```{r fig.height=6, fig.width=6}
 title = 'Average Points in 2021-22 vs 2020-21'
@@ -280,10 +254,10 @@ g = ggplot(ds, aes(x = s2021,
   geom_text(hjust = -.1) +
   labs(title = title,
        x     = 'Average Points in 2020-21 Season',
-       y     = 'Average Points in 2021-22 Season') +
+       y     = 'Average Points in 2021-22 Season')+
   scale_x_continuous(limits=c(103, 121), breaks=c(103,112,121), oob=squish, labels=comma)+
   scale_y_continuous(limits=c(103, 121), breaks=c(103,112,121), oob=squish, labels=comma)+
-  coord_cartesian(clip='off', expand=FALSE) +
+  coord_cartesian(clip='off', expand=FALSE)+
   theme_pub(type='scatter', base_size = 12) 
 
 
@@ -298,7 +272,7 @@ A few notes about the additional code for this plot
 
 The function `pub` can save us a lot of code if we are comfortable accepting the defaults for `scale*` and `coord*`. This results in the same plot as above.
 
-```{r fig.height = 6, fig.width = 6}
+```{r}
 title = 'Average Points in 2021-22 vs 2020-21'
 g = ggplot(ds, aes(x = s2021, 
                    y = s2022, 
@@ -308,13 +282,9 @@ g = ggplot(ds, aes(x = s2021,
   labs(title = title,
        x     = 'Average Points in 2020-21 Season',
        y     = 'Average Points in 2021-22 Season')
+  
 
-g
 
-g %>% 
-  pub(type = 'scatter', 
-      xlim = c(103, 121), 
-      ylim = c(103, 121))
 
 
 ```
@@ -325,14 +295,7 @@ g %>%
 Find opponents points. 
 
 ```{r}
-opp.pts = dd %>%
-  group_by(team) %>%
-  summarise(avg.pts.allowed = mean(opp.score))
 
-dd = dd %>% 
-  left_join(opp.pts, 
-            by = c('opp' = 'team'))
-head(dd)
 ```
 
 Add columns with conference and division to the data. 
@@ -364,34 +327,6 @@ Now we can make a scatter plot of points scored vs average points allowed by opp
 
 ```{r fig.width=6, fig.height=5}
 
-title = "Points Scored vs Average Opp Points Allowed" 
-
-g = ggplot(dg, aes(x     = avg.pts.allowed, 
-                   y     = score, 
-                   group = group, 
-                   color = group))+
-  geom_jitter(width  = 0.1, 
-              height = 0.1, 
-              alpha  = 0.1, 
-              size   = .75, 
-              show.legend = F) +
-  geom_smooth(method = 'lm', 
-              alpha  = 0.1, 
-              se     = F, 
-              size   = 1,
-              show.legend = F) +
-  geom_abline(slope = 1, 
-              intercept = 0) + 
-  facet_wrap(~div, 
-             nrow = 2) +
-  labs(title = title,
-       x     = 'Avg Points Allowed by Opponent',
-       y     = 'Points Scored in the Game')
-
-g %>% 
-  pub(xlim  = c(105, 119), 
-      ylim  = c(80 , 150), 
-      facet = T)
 
 ```
 
@@ -456,59 +391,21 @@ By default, R organizes the teams alphabetically. Instead of seeing teams alphab
 ```{r}
 dd = dd %>%
   arrange(date) %>%
-  group_by(team, season) %>%
+  group_by(team) %>%
   mutate(days.rest = c(NA, diff(date))) 
 
 dd %>% 
-  filter(team == 'PHI') 
+  filter(team == 'PHI') %>% 
+  head()
 ```
+
 ```{r}
-dg = dd %>%
-  filter(season == 2022) %>%
-  mutate(days.rest = 
-           ifelse(days.rest >= 3 | is.na(days.rest), 
-                  '3 or more', 
-                  days.rest)) %>%
-  group_by(team, 
-           days.rest) %>%
-  summarise(games = n()) %>% 
-  group_by( days.rest) %>%
-  mutate(max = max(games))
-  
-head(dg)
+
 ```
 
 ```{r fig.height = 6, fig.width = 6}
 
-## reverse the order so that teams are alphabetical from top to bottom
-dg$team = factor(dg$team, levels = rev(unique(dg$team)))
 
-title = "Number of Games With Each Number of Days Rest" 
-
-g = ggplot(dg, 
-           aes(x = games, 
-               y = team))+
-  geom_bar(stat  = 'identity', ## optional lightgray background bars 
-           aes(x = max+10), 
-           color = NA, 
-           fill  = publightgray, 
-           width = 0.8) + 
-  geom_bar(stat = 'identity', 
-           fill = pubred, 
-           color = NA, 
-           width = 0.8) + 
-  geom_text(aes(label = round(games,2)), 
-            hjust = -0.1, 
-            vjust = 0.4) + ## optional numbers with reasonable number of digits
-  facet_wrap(~days.rest, 
-             scales = 'free')+
-  labs(title = title,
-       x = NULL, ## Optional. 
-       y = NULL)   ## Optional. Upper Lower.
-
-g %>% 
-  pub(type = 'bar', 
-      base_size = 36/4) 
 
 ```
 
@@ -517,80 +414,18 @@ g %>%
 Let's explore the relationship between `days.rest` and game outcomes. 
 
 ```{r}
-dr = dd %>%
-  mutate(days.rest = 
-           ifelse(days.rest >= 5 | is.na(days.rest), 
-                  '5 or more', 
-                  days.rest)) %>%
-  group_by(days.rest) %>%
-  summarise(score     = round(mean(    score),2), 
-            opp.score = round(mean(opp.score),2), 
-            n = n()) %>%
-  mutate(days.rest = factor(days.rest, 
-                            levels = c('5 or more', 4:1))) 
-dr
-```
-
-```{r}
-dr = dr %>% 
-  mutate(max = 150, 
-         label = paste0(round(score,1), ' (n = ', n, ')'))
-
-title = "Average Points Scored by Days Rest" 
-g = ggplot(dr, aes(x = score, 
-                   y = days.rest)) +
-  geom_bar(stat = 'identity', 
-           aes(x = max), 
-           color = NA, 
-           fill = publightgray, 
-           width = 0.8) + ## optional background bars. 
-  geom_bar(stat = 'identity', 
-           fill = pubred, 
-           color = NA, 
-           width = 0.8) + 
-  geom_text(aes(label = label), 
-            hjust = -0.1) + ## optional numbers with reasonable number of digits
-  labs(title = title,
-       x = 'Average Points Scored', ## Optional. 
-       y = 'Days Rest') ## Optional. Upper Lower.
-
-g %>% 
-  pub(type = 'bar',
-      base_size = 36/3, 
-      xlim = c(0, 150)) 
 
 ```
 
 ```{r}
-dr = dr %>% 
-  mutate(max = 150, 
-         label = paste0(round(opp.score,1), ' (n = ', n, ')'))
 
-title = "Average Points Allowed by Days Rest" 
-g = ggplot(dr, 
-           aes(x = opp.score,
-               y = days.rest))+
-  geom_bar(stat = 'identity', 
-           aes(x = max), 
-           color = NA, 
-           fill = publightgray, 
-           width = 0.8)+ ## optional background bars. 
-  geom_bar(stat = 'identity', 
-           fill = pubred, 
-           color = NA, 
-           width = 0.8)+ 
-  geom_text(aes(label = label), 
-            hjust = -0.1)+ ## optional numbers with reasonable number of digits
-  labs(title = title,
-       x = 'Average Points Allowed', ## Optional. 
-       y = 'Days Rest')  ## Optional. Upper Lower.
 
-g %>%
-  pub(type = 'bar', 
-      base_size = 36/3, 
-      xlim = c(0,150)) 
 ```
 
+```{r}
 
 
+```
+
+## Total distance travel by team (if time)
 
